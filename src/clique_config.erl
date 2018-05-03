@@ -428,7 +428,8 @@ set_config_test_setup() ->
 
     ?assertEqual(ok, file:write_file(?SET_TEST_SCHEMA_FILE, Schema)),
     ?assertEqual(ok, init()),
-    ?assertEqual(ok, load_schema([Cwd])).
+    ?assertEqual(ok, load_schema([Cwd])),
+    clique_nodes:teardown().
 
 set_config_test_teardown(_) ->
     _ = ets:delete(?config_table),

@@ -104,19 +104,33 @@ io_request(From, ReplyAs, Req, State) ->
 io_reply(From, ReplyAs, Reply) ->
     From ! {io_reply, ReplyAs, Reply}.
 
+-ifndef('21.0').
+put_chars(M, F, A, State) ->
+    try apply(M, F, A) of
+        Chars ->
+            io_request({put_chars, Chars}, State)
+    catch C:T ->
+            {{error, {C,T, erlang:get_stacktrace()}}, State}
+    end.
+-else.
+put_chars(M, F, A, State) ->
+    try apply(M, F, A) of
+        Chars ->
+            io_request({put_chars, Chars}, State)
+    catch C:T:Stack ->
+            {{error, {C,T, Stack}}, State}
+    end.
+-endif.
+
 %% Handles io requests
 %% Output:
 io_request({put_chars, Chars},
            #state{output=O}=State) when is_binary(Chars);
                                         is_list(Chars) ->
     {ok, State#state{output=[Chars|O]}};
+
 io_request({put_chars, M, F, A}, State) ->
-    try apply(M, F, A) of
-        Chars ->
-            io_request({put_chars, Chars}, State)
-    catch C:T ->
-            {{error, {C,T, erlang:get_stacktrace()}}, State}
-    end;
+    put_chars(M, F, A, State);
 io_request({put_chars, _Enc, Chars}, State) ->
     io_request({put_chars, Chars}, State);
 io_request({put_chars, _Enc, Mod, Func, Args}, State) ->
