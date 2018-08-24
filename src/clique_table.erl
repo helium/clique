@@ -67,7 +67,17 @@ autosize_create_table(Schema, Rows, Constraints) ->
     MaxLineLen = case io:columns() of
                      %% Leaving an extra space seems to work better
                      {ok, N} -> N - 1;
-                     {error, enotsup} -> ?MAX_LINE_LEN
+                     {error, enotsup} ->
+                         %% see if the calling envionment has exported an env var with the information we need
+                         case rpc:call(node(erlang:group_leader()), os, getenv, ["CLIQUE_COLUMNS"]) of
+                             false ->
+                                 ?MAX_LINE_LEN;
+                             Value ->
+                                 try list_to_integer(Value) of
+                                     Res -> Res - 1
+                                 catch _:_ -> ?MAX_LINE_LEN
+                                 end
+                         end
                  end,
     Sizes = get_field_widths(MaxLineLen - BorderSize, [Schema | Rows],
                              proplists:get_value(fixed_width, Constraints, [])),
