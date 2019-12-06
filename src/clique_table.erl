@@ -259,6 +259,9 @@ align(undefined, Size) ->
     align("", Size);
 align(Str, Size) when is_integer(Str) ->
     align(integer_to_list(Str), Size);
+align(Str, Size) when is_float(Str) ->
+    %% cuttlefish provides 6 decimals; we will too.
+    align(float_to_list(Str, [{decimals, 6}, compact]), Size);
 align(Str, Size) when is_binary(Str) ->
     align(unicode:characters_to_list(Str, utf8), Size);
 align(Str, Size) when is_atom(Str) ->
