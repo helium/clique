@@ -332,8 +332,12 @@ spec() ->
 
 dt_validate_spec() ->
     Cmd = ["riak-admin", "test", "something"],
-    KeySpecs = [clique_spec:make({sample_size, [{datatype, integer},
-                                                {validator, fun greater_than_zero/1}]})],
+    KeySpecs = [
+                clique_spec:make({sample_size, [{datatype, integer},
+                                                {validator, fun greater_than_zero/1}]}),
+                clique_spec:make({float_precision, [{datatype, float},
+                                                {validator, fun greater_than_zero/1}]})
+               ],
     FlagSpecs = [clique_spec:make({node, [{shortname, "n"},
                                           {longname, "node"},
                                           {datatype, atom},
@@ -437,6 +441,13 @@ arg_datatype_test() ->
 
     InvalidTypeArg = [{"sample_size", "A"}],
     ?assertMatch({error, _}, validate({Spec, InvalidTypeArg, [], []})).
+
+arg_float_test() ->
+    Spec = dt_validate_spec(),
+    Cmd = element(1, Spec),
+    ValidArg = [{"float_precision", "1.2"}],
+    {undefined, Cmd, ConvertedArgs, [], []} = validate({Spec, ValidArg, [], []}),
+    ?assertEqual(ConvertedArgs, [{float_precision, 1.2}]).
 
 arg_validation_test() ->
     Spec = dt_validate_spec(),
