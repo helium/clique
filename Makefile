@@ -7,21 +7,21 @@ PULSE_TESTS = worker_pool_pulse
 all: deps compile
 
 compile: deps
-	./rebar compile
+	./rebar3 compile
 
 deps:
-	./rebar get-deps
+	./rebar3 get-deps
 
 clean:
-	./rebar clean
+	./rebar3 clean
 
 distclean: clean
-	./rebar delete-deps
+	./rebar3 delete-deps
 
 # You should 'clean' before your first run of this target
 # so that deps get built with PULSE where needed.
 pulse:
-	./rebar compile -D PULSE
-	./rebar eunit -D PULSE skip_deps=true suite=$(PULSE_TESTS)
+	./rebar3 compile -D PULSE
+	./rebar3 eunit -D PULSE skip_deps=true suite=$(PULSE_TESTS)
 
 include tools.mk
