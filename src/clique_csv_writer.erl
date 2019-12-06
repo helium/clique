@@ -79,7 +79,7 @@ format_val(V) when is_binary(V) ->
     format_val(unicode:characters_to_list(V, utf8));
 format_val(V) when is_float(V) ->
     %% cuttlefish provides 6 decimals, so we will too.
-    format_val(float_to_list(V, [{decimals, 6}, compact]);
+    format_val(float_to_list(V, [{decimals, 6}, compact]));
 format_val(Str0) when is_list(Str0) ->
     %% TODO: This could probably be done more efficiently.
     %% Maybe we could write a strip func that works directly on iolists?
